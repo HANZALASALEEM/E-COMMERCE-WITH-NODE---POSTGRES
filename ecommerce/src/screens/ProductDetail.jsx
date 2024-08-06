@@ -4,19 +4,33 @@ function ProductDetail() {
 	const location = useLocation();
 	const { state: product } = location;
 	return (
-		<div className="bg-red-100 w-screen h-screen flex flex-row">
-			{/* image container */}
-			<div className="w-1/3 h-full flex items-center justify-center">
-				<img src={require("../assests/images/product-img.jpg")} />
+		<div className="flex-col">
+			<div className=" w-screen flex md:flex-row flex-col py-10">
+				{/* image container */}
+				<div className="w-full md:w-1/3 h-full flex items-center justify-center">
+					<img src={require("../assests/images/product-img.jpg")} />
+				</div>
+				{/* title container */}
+				<div className="w-full md:w-1/3 h-full flex flex-col items-start justify-center">
+					<h1 className="text-2xl font-semibold px-4">{product.title}</h1>
+					<p className="px-4 py-4">Price: {product.price}$</p>
+					<p className="px-4">Seller Name: {product.sellerName}</p>
+				</div>
+				{/* add to cart container */}
+				<div className="w-full md:w-1/3 flex items-center justify-center">
+					<div className="border-2 border-gray-400 w-96 flex flex-col my-4 mx-2 items-center justify-center rounded-xl">
+						<button className="bg-yellow-500 w-64 h-8 my-3 rounded-xl hover:border-yellow-500 hover:bg-white hover:border-2">
+							Add to Cart
+						</button>
+						<button className="bg-yellow-500 w-64 h-8 my-3 rounded-xl hover:border-yellow-500 hover:bg-white hover:border-2">
+							Buy Now
+						</button>
+					</div>
+				</div>
 			</div>
-			{/* title container */}
-			<div className="w-1/3 h-full flex flex-col items-start justify-center">
-				<h1 className="text-2xl font-semibold px-4">{product.title}</h1>
-				<p className="px-4">Price: {product.price}$</p>
-				<p className="px-4">{product.description}</p>
+			<div className="px-4">
+				<p>{product.description}</p>
 			</div>
-			{/* add to cart container */}
-			<div></div>
 		</div>
 	);
 }
