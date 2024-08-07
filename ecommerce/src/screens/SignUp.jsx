@@ -19,9 +19,8 @@ function SignUp() {
 			if (response.status === 400) {
 				alert("User already exist");
 			} else if (response.status === 201) {
-				navigate("/home");
 				const data = await response.json();
-				console.log(data);
+				navigate("/home", { state: data.data });
 			} else {
 				console.error("Signup failed");
 			}

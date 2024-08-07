@@ -1,8 +1,14 @@
 import React from "react";
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 function ProductDetail() {
 	const location = useLocation();
-	const { state: product } = location;
+	const { productData, userData } = location.state;
+
+	useEffect(() => {
+		console.log(userData.email);
+	}, []);
+
 	return (
 		<div className="flex-col">
 			<div className=" w-screen flex md:flex-row flex-col py-10">
@@ -11,10 +17,10 @@ function ProductDetail() {
 					<img src={require("../assests/images/product-img.jpg")} />
 				</div>
 				{/* title container */}
-				<div className="w-full md:w-1/3 h-full flex flex-col items-start justify-center">
-					<h1 className="text-2xl font-semibold px-4">{product.title}</h1>
-					<p className="px-4 py-4">Price: {product.price}$</p>
-					<p className="px-4">Seller Name: {product.sellerName}</p>
+				<div className="w-full md:w-1/3 h-full flex flex-col items-start justify-center pt-16">
+					<h1 className="text-2xl font-semibold px-4">{productData.title}</h1>
+					<p className="px-4 py-4">Price: {productData.id}$</p>
+					<p className="px-4">Seller Name: {productData.sellerName}</p>
 				</div>
 				{/* add to cart container */}
 				<div className="w-full md:w-1/3 flex items-center justify-center">
@@ -29,7 +35,7 @@ function ProductDetail() {
 				</div>
 			</div>
 			<div className="px-4">
-				<p>{product.description}</p>
+				<p>{productData.description}</p>
 			</div>
 		</div>
 	);

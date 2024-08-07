@@ -1,20 +1,12 @@
 import prisma from "./db/db.config.js";
 
 import PoolData from "pg";
-const { Pool } = PoolData;
-const pool = new Pool({
-	user: "postgres",
-	host: "localhost",
-	database: "e_commerce",
-	password: "password",
-	port: 5432,
-});
 
 export const signup = async (req, res) => {
 	const { email, password } = req.body;
 	console.log(req.body);
 	if (!email || !password) {
-		return res.status(400).send("All fields are required!");
+		return res.status(400).json({ msg: "All fields are required" });
 	}
 
 	try {
@@ -25,7 +17,7 @@ export const signup = async (req, res) => {
 		});
 
 		if (findUser) {
-			return res.status(400).send("Email already exists. try another one");
+			return res.status(400).json({ status: 400, msg: "User already exists" });
 		}
 
 		const newUser = await prisma.users.create({
@@ -34,10 +26,11 @@ export const signup = async (req, res) => {
 				password: password,
 			},
 		});
-		return res.status(201).send("New User Sign Up");
+		return res
+			.status(201)
+			.json({ status: 201, msg: "New User Sign Up", data: newUser });
 	} catch (err) {
-		console.error(err);
-		res.status(500).send("Some error has occurred");
+		return res.status(500).json({ status: 500, msg: "Internal server error" });
 	}
 };
 
@@ -45,7 +38,9 @@ export const signin = async (req, res) => {
 	const { email, password } = req.body;
 	console.log(req.body);
 	if (!email || !password) {
-		return res.status(400).send("All fields are required!");
+		return res
+			.status(400)
+			.json({ status: 400, msg: "All fields are required" });
 	}
 
 	try {
@@ -57,12 +52,13 @@ export const signin = async (req, res) => {
 		});
 
 		if (validUser) {
-			return res.status(200).send("User Sign In ");
+			return res
+				.status(200)
+				.json({ status: 200, msg: "User Sign In ", data: validUser });
 		} else {
-			return res.status(404).send("User not found");
+			return res.status(404).json({ status: 404, msg: "User not found" });
 		}
 	} catch (err) {
-		console.error(err);
-		res.status(500).send("Some error has occurred");
+		return res.status(500).json({ status: 500, msg: "Internal server error" });
 	}
 };

@@ -6,6 +6,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import { signin, signup } from "./user.js";
 import { fetchProducts, sellProduct } from "./product.js";
+import { addToCart } from "./cart.js";
 const app = express();
 const port = 8080;
 
@@ -21,6 +22,7 @@ app.use("/signup", signup);
 app.use("/signin", signin);
 app.use("/sellProduct", sellProduct);
 app.use("/fetchProduct", fetchProducts);
+app.use("/addToCart", addToCart);
 
 app.listen(port, () => {
 	console.log(`Example app listening on port ${port}`);

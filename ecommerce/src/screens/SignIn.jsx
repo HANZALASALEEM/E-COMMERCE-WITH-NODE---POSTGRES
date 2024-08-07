@@ -19,9 +19,8 @@ function SignIn() {
 			if (response.status === 404) {
 				alert("User not found");
 			} else if (response.status === 200) {
-				navigate("/home");
 				const data = await response.json();
-				console.log(data);
+				navigate("/home", { state: data.data });
 			} else {
 				console.error("Signin failed");
 			}

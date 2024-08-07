@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+
 function Home() {
 	const navigate = useNavigate();
+	const location = useLocation();
+	const { state: userData } = location;
 	const [productList, setProductList] = useState([]);
 	const handleSellSomething = () => {
 		navigate("/sell");
 	};
 
 	useEffect(() => {
+		console.log(userData);
 		const fetchProduct = async () => {
 			try {
 				const response = await fetch("http://localhost:8080/fetchProduct", {
@@ -36,7 +40,9 @@ function Home() {
 
 	const handleProductDetailPage = (item) => {
 		console.log(item);
-		navigate("/productDetail", { state: item });
+		navigate("/productDetail", {
+			state: { productData: item, userData: userData },
+		});
 	};
 
 	return (
@@ -75,7 +81,10 @@ function Home() {
 				</div>
 			</div>
 			{productList.map((item) => (
-				<div className="w-full my-3  px-16 flex items-center flex-col md:flex-row md:gap-4 border-2">
+				<div
+					className="w-full my-3  px-16 flex items-center flex-col md:flex-row md:gap-4 border-2"
+					key={item.id}
+				>
 					<button
 						className="w-64 h-64"
 						onClick={() => handleProductDetailPage(item)}
