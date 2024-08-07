@@ -73,14 +73,26 @@ export const addToCart = async (req, res) => {
 	}
 };
 
-export const fetchProducts = async (req, res) => {
+export const fetchCartItems = async (req, res) => {
+	const { user_id } = req.body;
 	try {
-		const ProductList = await prisma.products.findMany({});
+		const cart = await prisma.cart.findUnique({
+			where: {
+				id: user_id,
+			},
+			include: {
+				items: {
+					include: {
+						product: true,
+					},
+				},
+			},
+		});
 
-		if (ProductList) {
-			return res.json({ status: 200, data: ProductList });
+		if (cart) {
+			return res.json({ status: 200, data: cart });
 		} else {
-			return res.status(404).send("Product List not found");
+			return res.status(404).send("Cart not found related to this user");
 		}
 	} catch (err) {
 		console.error(err);
