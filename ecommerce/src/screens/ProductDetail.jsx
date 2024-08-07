@@ -1,19 +1,18 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import stateManager from "../context/manageStateContext";
 function ProductDetail() {
+	const context = useContext(stateManager);
 	const navigate = useNavigate();
-	const location = useLocation();
-	const { productData, userData } = location.state;
+	// const location = useLocation();
+	// const { productData, userData } = location.state;
 	const [user_id, setUser_id] = useState("");
 	const [product_id, setProduct_id] = useState("");
 
 	useEffect(() => {
-		setUser_id(userData.id);
-		setProduct_id(productData.id);
-		console.log(user_id);
-		console.log(product_id);
-		console.log(userData.id);
+		setUser_id(context.userData.id);
+		setProduct_id(context.productData.id);
 	}, []);
 
 	const handleAddToCart = async (e) => {
@@ -49,9 +48,11 @@ function ProductDetail() {
 				</div>
 				{/* title container */}
 				<div className="w-full md:w-1/3 h-full flex flex-col items-start justify-center pt-16">
-					<h1 className="text-2xl font-semibold px-4">{productData.title}</h1>
-					<p className="px-4 py-4">Price: {productData.id}$</p>
-					<p className="px-4">Seller Name: {productData.sellerName}</p>
+					<h1 className="text-2xl font-semibold px-4">
+						{context.productData.title}
+					</h1>
+					<p className="px-4 py-4">Price: {context.productData.price}$</p>
+					<p className="px-4">Seller Name: {context.productData.sellerName}</p>
 				</div>
 				{/* add to cart container */}
 				<div className="w-full md:w-1/3 flex items-center justify-center">
@@ -69,7 +70,7 @@ function ProductDetail() {
 				</div>
 			</div>
 			<div className="px-4">
-				<p>{productData.description}</p>
+				<p>{context.productData.description}</p>
 			</div>
 		</div>
 	);

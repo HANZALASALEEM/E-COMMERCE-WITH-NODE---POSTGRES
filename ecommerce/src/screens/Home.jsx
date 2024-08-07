@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import stateManager from "../context/manageStateContext";
 
 function Home() {
+	const context = useContext(stateManager);
 	const navigate = useNavigate();
-	const location = useLocation();
-	const { state: userData } = location;
+	// const location = useLocation();
+	// const { state: userData } = location;
 	const [productList, setProductList] = useState([]);
 	const handleSellSomething = () => {
 		navigate("/sell");
 	};
 
 	useEffect(() => {
-		console.log(userData);
+		console.log(context.userData);
 		const fetchProduct = async () => {
 			try {
 				const response = await fetch("http://localhost:8080/fetchProduct", {
@@ -39,10 +41,12 @@ function Home() {
 	}, []);
 
 	const handleProductDetailPage = (item) => {
-		console.log(item);
-		navigate("/productDetail", {
-			state: { productData: item, userData: userData },
-		});
+		context.setProductData(item);
+		navigate(
+			"/productDetail" /*, {
+			state: { productData: item, userData: context.userData },
+		}*/
+		);
 	};
 
 	return (

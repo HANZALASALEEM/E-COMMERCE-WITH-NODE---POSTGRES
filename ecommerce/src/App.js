@@ -6,6 +6,7 @@ import Home from "./screens/Home";
 import SignIn from "./screens/SignIn";
 import Sell from "./screens/Sell";
 import ProductDetail from "./screens/ProductDetail";
+import ManageState from "./context/manageState";
 function App() {
 	return (
 		<BrowserRouter>
