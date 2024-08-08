@@ -30,11 +30,10 @@ function ProductDetail() {
 
 				if (response.status === 201) {
 					const data = await response.json();
-					console.log(data.data);
-					navigate("/home");
+					fetchCartItems();
+					alert("Added in Cart");
 				} else {
-					console.log(response.status);
-					console.log("Product not add into cart");
+					console.log(" Error Status: ", response.status);
 				}
 			} catch (error) {
 				console.error("Error:", error);
@@ -52,12 +51,11 @@ function ProductDetail() {
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify({ user_id }),
+					body: JSON.stringify({ cart_id }),
 				});
 				if (response.status === 200) {
 					const data = await response.json();
 					setCartItemAmount(data.data.items.length);
-					console.log("Fetched cart items:", data.data.items.length);
 				} else {
 					console.error(
 						"Failed to fetch cart items, status code:",

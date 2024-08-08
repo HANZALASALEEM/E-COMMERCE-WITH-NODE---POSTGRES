@@ -74,12 +74,11 @@ export const addToCart = async (req, res) => {
 };
 
 export const fetchCartItems = async (req, res) => {
-	const { user_id } = req.body;
-	console.log(user_id);
+	const { cart_id } = req.body;
 	try {
 		const cart = await prisma.cart.findUnique({
 			where: {
-				id: user_id,
+				id: cart_id,
 			},
 			include: {
 				items: {

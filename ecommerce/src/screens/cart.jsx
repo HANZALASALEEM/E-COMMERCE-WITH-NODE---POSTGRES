@@ -4,10 +4,12 @@ import stateManager from "../context/manageStateContext";
 function Cart() {
 	const context = useContext(stateManager);
 	const [user_id, setUser_id] = useState(0);
+	const [cart_id, setCart_id] = useState(0);
 	const [cartItemList, setCartItemList] = useState([]);
 	useEffect(() => {
 		if (context.userData && context.userData.id) {
-			setUser_id(context.userData.id - 1);
+			setUser_id(context.userData.id);
+			setCart_id(context.userData.id - 1);
 			console.log(context.userData.id);
 		}
 	}, [context.userData]);
@@ -25,7 +27,7 @@ function Cart() {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ user_id }),
+				body: JSON.stringify({ cart_id }),
 			});
 			if (response.status === 200) {
 				const data = await response.json();
@@ -45,7 +47,6 @@ function Cart() {
 	const handleDeleteItem = async (item) => {
 		const item_id = parseInt(item.id);
 		try {
-			window.location.reload();
 			await fetch("http://localhost:8080/deleteCartItems", {
 				method: "POST",
 				headers: {
@@ -53,7 +54,6 @@ function Cart() {
 				},
 				body: JSON.stringify({ item_id }),
 			});
-			window.location.reload();
 		} catch (error) {
 			console.error("Error fetching cart items:", error);
 		}

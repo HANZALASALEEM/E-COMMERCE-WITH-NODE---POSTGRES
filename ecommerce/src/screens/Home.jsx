@@ -7,11 +7,13 @@ function Home() {
 	const navigate = useNavigate();
 	const [productList, setProductList] = useState([]);
 	const [user_id, setUser_id] = useState(0);
+	const [cart_id, setCart_id] = useState(0);
 	const [cartItemAmount, setCartItemAmount] = useState(0);
 
 	useEffect(() => {
 		if (context.userData && context.userData.id) {
-			setUser_id(context.userData.id - 1);
+			setUser_id(context.userData.id);
+			setCart_id(context.userData.id - 1);
 		}
 	}, [context.userData]);
 
@@ -43,14 +45,14 @@ function Home() {
 	}, []);
 
 	const fetchCartItems = useCallback(async () => {
-		if (user_id) {
+		if (cart_id) {
 			try {
 				const response = await fetch("http://localhost:8080/fetchCartItems", {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify({ user_id }),
+					body: JSON.stringify({ cart_id }),
 				});
 				if (response.status === 200) {
 					const data = await response.json();
@@ -65,7 +67,7 @@ function Home() {
 				console.error("Error fetching cart items:", error);
 			}
 		}
-	}, [user_id]);
+	}, [cart_id]);
 
 	useEffect(() => {
 		fetchCartItems();
