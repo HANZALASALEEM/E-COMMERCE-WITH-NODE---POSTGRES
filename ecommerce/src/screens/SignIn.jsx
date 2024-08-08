@@ -1,8 +1,7 @@
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import stateManager from "../context/manageStateContext";
+
 function SignIn() {
-	const context = useContext(stateManager);
 	const navigate = useNavigate();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -22,9 +21,8 @@ function SignIn() {
 				alert("User not found");
 			} else if (response.status === 200) {
 				const data = await response.json();
-				context.setUserData(data.data);
-				console.log(context.userData.id);
-				navigate("/home" /*, { state: data.data }*/);
+				sessionStorage.setItem("user_id", data.data.id);
+				navigate("/home");
 			} else {
 				console.error("Signin failed");
 			}

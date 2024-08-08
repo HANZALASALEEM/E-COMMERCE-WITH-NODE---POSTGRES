@@ -1,59 +1,64 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import stateManager from "../context/manageStateContext";
 
 function Cart() {
 	const context = useContext(stateManager);
-	const [user_id, setUser_id] = useState(0);
+	const [user_id, setUser_id] = useState(
+		parseInt(sessionStorage.getItem("user_id"))
+	);
 	const [cart_id, setCart_id] = useState(0);
 	const [cartItemList, setCartItemList] = useState([]);
+	const [cartItemAmount, setCartItemAmount] = useState(0);
 	useEffect(() => {
-		if (context.userData && context.userData.id) {
-			setUser_id(context.userData.id);
-			setCart_id(context.userData.id - 1);
-			console.log(context.userData.id);
-		}
-	}, [context.userData]);
+		setCart_id(user_id - 1);
+	}, []);
 
-	useEffect(() => {
-		if (user_id) {
-			fetchCartItems();
-		}
-	}, [user_id]);
-
-	const fetchCartItems = async () => {
-		try {
-			const response = await fetch("http://localhost:8080/fetchCartItems", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ cart_id }),
-			});
-			if (response.status === 200) {
-				const data = await response.json();
-				setCartItemList(data.data.items);
-				console.log("Fetched cart items:", cartItemList);
-			} else {
-				console.error(
-					"Failed to fetch cart items, status code:",
-					response.status
-				);
+	const fetchCartItems = useCallback(async () => {
+		if (cart_id) {
+			try {
+				const response = await fetch("http://localhost:8080/fetchCartItems", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ cart_id }),
+				});
+				if (response.status === 200) {
+					const data = await response.json();
+					setCartItemAmount(data.data.items.length);
+					setCartItemList(data.data.items);
+				} else {
+					console.error(
+						"Failed to fetch cart items, status code:",
+						response.status
+					);
+				}
+			} catch (error) {
+				console.error("Error fetching cart items:", error);
 			}
-		} catch (error) {
-			console.error("Error fetching cart items:", error);
 		}
-	};
+	}, [cart_id]);
 
+	useEffect(() => {
+		fetchCartItems();
+	}, [fetchCartItems]);
 	const handleDeleteItem = async (item) => {
 		const item_id = parseInt(item.id);
 		try {
-			await fetch("http://localhost:8080/deleteCartItems", {
+			const response = await fetch("http://localhost:8080/deleteCartItems", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({ item_id }),
 			});
+			if (response.status === 200) {
+				console.log("Item deleted successfully");
+				// Fetch cart items again to refresh the list
+				fetchCartItems();
+			} else {
+				console.error("Failed to delete item, status code:", response.status);
+			}
 		} catch (error) {
 			console.error("Error fetching cart items:", error);
 		}
@@ -80,7 +85,17 @@ function Cart() {
 					</div>
 				</div>
 				{/* cart Icon */}
-				<div className="h-full w-1/4 flex items-center justify-center"></div>
+				<div className="h-full w-1/4 flex items-center justify-center">
+					<div className="h-full w-full flex flex-col items-center justify-center">
+						<div className="w-4 h-4 bg-white rounded-full flex items-center justify-center text-slate-900 font-bold text-sm">
+							<p>{cartItemAmount}</p>
+						</div>
+						<img
+							className="w-8 h-8"
+							src={require("../assests/images/grocery-store.png")}
+						/>
+					</div>
+				</div>
 			</div>
 			{cartItemList.map((item) => (
 				<div

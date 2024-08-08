@@ -22,6 +22,21 @@ export const addToCart = async (req, res) => {
 			return res.status(404).json({ msg: "Product not found" });
 		}
 
+		const productAlreadyExist = await prisma.cartItem.findFirst({
+			where: {
+				product_id: Number(product_id),
+				cart: {
+					user_id: Number(user_id),
+				},
+			},
+		});
+
+		if (productAlreadyExist) {
+			return res
+				.status(400)
+				.json({ status: 400, msg: "Product already exists in cart" });
+		}
+
 		// Check if the user already has a cart
 		let userCart = await prisma.cart.findUnique({
 			where: { user_id: Number(user_id) },
@@ -90,13 +105,15 @@ export const fetchCartItems = async (req, res) => {
 		});
 
 		if (cart) {
-			return res.json({ status: 200, data: cart });
+			return res.status(200).json({ status: 200, data: cart });
 		} else {
-			return res.status(404).send("Cart not found related to this user");
+			return res
+				.status(404)
+				.json({ status: 404, msg: "Items not founded in cart" });
 		}
 	} catch (err) {
 		console.error(err);
-		res.status(500).send("Some error has occurred");
+		return res.status(500).json({ status: 500, msg: "Internal server error" });
 	}
 };
 
@@ -108,8 +125,11 @@ export const deleteCartItem = async (req, res) => {
 				id: item_id,
 			},
 		});
+		return res
+			.status(200)
+			.json({ status: 200, msg: "item deleted successfully" });
 	} catch (err) {
 		console.error(err);
-		res.status(500).send("Some error has occurred");
+		return res.status(500).json({ status: 500, msg: "Internal server error" });
 	}
 };

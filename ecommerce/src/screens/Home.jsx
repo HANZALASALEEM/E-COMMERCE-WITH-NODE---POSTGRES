@@ -1,21 +1,18 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import stateManager from "../context/manageStateContext";
 
 function Home() {
-	const context = useContext(stateManager);
 	const navigate = useNavigate();
 	const [productList, setProductList] = useState([]);
-	const [user_id, setUser_id] = useState(0);
+	const [user_id, setUser_id] = useState(
+		parseInt(sessionStorage.getItem("user_id"))
+	);
 	const [cart_id, setCart_id] = useState(0);
 	const [cartItemAmount, setCartItemAmount] = useState(0);
 
 	useEffect(() => {
-		if (context.userData && context.userData.id) {
-			setUser_id(context.userData.id);
-			setCart_id(context.userData.id - 1);
-		}
-	}, [context.userData]);
+		setCart_id(user_id - 1);
+	}, []);
 
 	const handleSellSomething = () => {
 		navigate("/sell");
@@ -74,12 +71,10 @@ function Home() {
 	}, [fetchCartItems]);
 
 	const handleProductDetailPage = (item) => {
-		context.setProductData(item);
-		navigate(
-			"/productDetail" /*, {
-			state: { productData: item, userData: context.userData },
-		}*/
-		);
+		sessionStorage.setItem("product_id", item.id);
+		navigate("/productDetail", {
+			state: { productData: item },
+		});
 	};
 	const handleCartButton = (item) => {
 		navigate("/cart");
