@@ -1,32 +1,34 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import stateManager from "../context/manageStateContext";
 
 function Home() {
 	const context = useContext(stateManager);
 	const navigate = useNavigate();
-	// const location = useLocation();
-	// const { state: userData } = location;
 	const [productList, setProductList] = useState([]);
+	const [user_id, setUser_id] = useState(0);
+	const [cartItemAmount, setCartItemAmount] = useState(0);
+
+	useEffect(() => {
+		if (context.userData && context.userData.id) {
+			setUser_id(context.userData.id - 1);
+		}
+	}, [context.userData]);
+
 	const handleSellSomething = () => {
 		navigate("/sell");
 	};
 
 	useEffect(() => {
-		console.log(context.userData);
 		const fetchProduct = async () => {
 			try {
 				const response = await fetch("http://localhost:8080/fetchProduct", {
 					method: "GET",
 				});
-				// const data = await response.json();
-				// setProductList(data.data);
-				// console.log("Fetched products:", productList);
+
 				if (response.status === 200) {
 					const data = await response.json();
-					// Assuming the data is an array of products
 					setProductList(data.data);
-					console.log("Fetched products:", productList);
 				} else {
 					console.error(
 						"Failed to fetch products, status code:",
@@ -40,6 +42,35 @@ function Home() {
 		fetchProduct();
 	}, []);
 
+	const fetchCartItems = useCallback(async () => {
+		if (user_id) {
+			try {
+				const response = await fetch("http://localhost:8080/fetchCartItems", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ user_id }),
+				});
+				if (response.status === 200) {
+					const data = await response.json();
+					setCartItemAmount(data.data.items.length);
+				} else {
+					console.error(
+						"Failed to fetch cart items, status code:",
+						response.status
+					);
+				}
+			} catch (error) {
+				console.error("Error fetching cart items:", error);
+			}
+		}
+	}, [user_id]);
+
+	useEffect(() => {
+		fetchCartItems();
+	}, [fetchCartItems]);
+
 	const handleProductDetailPage = (item) => {
 		context.setProductData(item);
 		navigate(
@@ -47,6 +78,9 @@ function Home() {
 			state: { productData: item, userData: context.userData },
 		}*/
 		);
+	};
+	const handleCartButton = (item) => {
+		navigate("/cart");
 	};
 
 	return (
@@ -78,10 +112,18 @@ function Home() {
 				</div>
 				{/* cart Icon */}
 				<div className="h-full w-1/4 flex items-center justify-center">
-					<img
-						className="w-8 h-8"
-						src={require("../assests/images/grocery-store.png")}
-					/>
+					<button
+						onClick={handleCartButton}
+						className="h-full w-full flex flex-col items-center justify-center"
+					>
+						<div className="w-4 h-4 bg-white rounded-full flex items-center justify-center text-slate-900 font-bold text-sm">
+							<p>{cartItemAmount}</p>
+						</div>
+						<img
+							className="w-8 h-8"
+							src={require("../assests/images/grocery-store.png")}
+						/>
+					</button>
 				</div>
 			</div>
 			{productList.map((item) => (
@@ -99,9 +141,7 @@ function Home() {
 						/>
 					</button>
 					<div className="w-full md:w-3/4 md:py-8 font-semibold">
-						<a href="/productDetail" className="text-2xl">
-							{item.title}
-						</a>
+						<h1 className="text-2xl">{item.title}</h1>
 						<p className="text-sm">Brand: {item.brand}</p>
 						<p className="text-sm">
 							Price: <span className="text-green-400">{item.price} $</span>

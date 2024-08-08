@@ -75,6 +75,7 @@ export const addToCart = async (req, res) => {
 
 export const fetchCartItems = async (req, res) => {
 	const { user_id } = req.body;
+	console.log(user_id);
 	try {
 		const cart = await prisma.cart.findUnique({
 			where: {
@@ -94,6 +95,20 @@ export const fetchCartItems = async (req, res) => {
 		} else {
 			return res.status(404).send("Cart not found related to this user");
 		}
+	} catch (err) {
+		console.error(err);
+		res.status(500).send("Some error has occurred");
+	}
+};
+
+export const deleteCartItem = async (req, res) => {
+	const { item_id } = req.body;
+	try {
+		await prisma.cartItem.delete({
+			where: {
+				id: item_id,
+			},
+		});
 	} catch (err) {
 		console.error(err);
 		res.status(500).send("Some error has occurred");

@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import stateManager from "../context/manageStateContext";
 function SignUp() {
+	const context = useContext(stateManager);
 	const navigate = useNavigate();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -20,6 +22,7 @@ function SignUp() {
 				alert("User already exist");
 			} else if (response.status === 201) {
 				const data = await response.json();
+				context.setUserData(data.data);
 				navigate("/home", { state: data.data });
 			} else {
 				console.error("Signup failed");

@@ -1,46 +1,126 @@
-import React, { useContext, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import stateManager from "../context/manageStateContext";
 function ProductDetail() {
 	const context = useContext(stateManager);
 	const navigate = useNavigate();
-	// const location = useLocation();
-	// const { productData, userData } = location.state;
-	const [user_id, setUser_id] = useState("");
-	const [product_id, setProduct_id] = useState("");
 
+	const [user_id, setUser_id] = useState(0);
+	const [cart_id, setCart_id] = useState(0);
+	const [product_id, setProduct_id] = useState(0);
+	const [cartItemAmount, setCartItemAmount] = useState(0);
 	useEffect(() => {
 		setUser_id(context.userData.id);
 		setProduct_id(context.productData.id);
+		setCart_id(context.userData.id - 1);
 	}, []);
 
 	const handleAddToCart = async (e) => {
 		e.preventDefault();
-		try {
-			const response = await fetch("http://localhost:8080/addToCart", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ user_id, product_id }),
-			});
+		if (user_id) {
+			try {
+				const response = await fetch("http://localhost:8080/addToCart", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ user_id, product_id }),
+				});
 
-			if (response.status === 201) {
-				const data = await response.json();
-				console.log(data.data);
-				navigate("/home");
-			} else {
-				console.log(response.status);
-				console.log("Product not add into cart");
+				if (response.status === 201) {
+					const data = await response.json();
+					console.log(data.data);
+					navigate("/home");
+				} else {
+					console.log(response.status);
+					console.log("Product not add into cart");
+				}
+			} catch (error) {
+				console.error("Error:", error);
 			}
-		} catch (error) {
-			console.error("Error:", error);
+		} else {
+			navigate("/signIn");
 		}
+	};
+
+	const fetchCartItems = useCallback(async () => {
+		if (cart_id) {
+			try {
+				const response = await fetch("http://localhost:8080/fetchCartItems", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ user_id }),
+				});
+				if (response.status === 200) {
+					const data = await response.json();
+					setCartItemAmount(data.data.items.length);
+					console.log("Fetched cart items:", data.data.items.length);
+				} else {
+					console.error(
+						"Failed to fetch cart items, status code:",
+						response.status
+					);
+				}
+			} catch (error) {
+				console.error("Error fetching cart items:", error);
+			}
+		}
+	}, [cart_id]);
+
+	useEffect(() => {
+		fetchCartItems();
+	}, [fetchCartItems]);
+
+	const handleCartButton = (item) => {
+		navigate("/cart");
 	};
 
 	return (
 		<div className="flex-col">
+			{/* navbar */}
+			<div className="w-screen h-16 bg-slate-900 items-center justify-between flex flex-row py-2 px-4">
+				{/* sell Button */}
+				<div className=" h-full w-1/4 items-center justify-center flex">
+					<button
+						className="bg-yellow-500 w-64 h-full rounded-2xl hover:border-yellow-500 hover:bg-slate-900 hover:text-white hover:border-2 cursor-pointer"
+						// onClick={handleSellSomething}
+					>
+						Sell Something
+					</button>
+				</div>
+				{/* search bar */}
+				<div className=" h-full w-2/4 items-center justify-center flex">
+					<div className="w-full md:w-3/4 h-full flex justify-center ">
+						<div className="w-3/4 rounded-tl-2xl rounded-bl-2xl border-2 border-gray-400 pl-3 bg-white">
+							<input className="w-full h-full" />
+						</div>
+						<div className="bg-yellow-500 w-16 flex items-center justify-center rounded-tr-2xl rounded-br-2xl">
+							<img
+								className="w-8 h-8"
+								src={require("../assests/images/search.png")}
+							/>
+						</div>
+					</div>
+				</div>
+				{/* cart Icon */}
+				<div className="h-full w-1/4 flex items-center justify-center">
+					<button
+						onClick={handleCartButton}
+						className="h-full w-full flex flex-col items-center justify-center"
+					>
+						<div className="w-4 h-4 bg-white rounded-full flex items-center justify-center text-slate-900 font-bold text-sm">
+							<p>{cartItemAmount}</p>
+						</div>
+						<img
+							className="w-8 h-8"
+							src={require("../assests/images/grocery-store.png")}
+						/>
+					</button>
+				</div>
+			</div>
 			<div className=" w-screen flex md:flex-row flex-col py-10">
 				{/* image container */}
 				<div className="w-full md:w-1/3 h-full flex items-center justify-center">

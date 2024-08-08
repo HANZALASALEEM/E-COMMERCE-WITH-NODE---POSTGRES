@@ -7,6 +7,8 @@ import SignIn from "./screens/SignIn";
 import Sell from "./screens/Sell";
 import ProductDetail from "./screens/ProductDetail";
 import ManageState from "./context/manageState";
+import Cart from "./screens/cart";
+
 function App() {
 	return (
 		<BrowserRouter>
@@ -16,6 +18,7 @@ function App() {
 				<Route path="/home" element={<Home />} />
 				<Route path="/sell" element={<Sell />} />
 				<Route path="/productDetail" element={<ProductDetail />} />
+				<Route path="/cart" element={<Cart />} />
 			</Routes>
 		</BrowserRouter>
 	);
